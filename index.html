@@ -6,6 +6,9 @@
 <title>Igreja Presbiteriana Atos em Itaipuaçu</title>
 <meta name="description" content="Pregações, podcast, horários e contato da Igreja Presbiteriana Atos em Itaipuaçu, Maricá/RJ.">
 <meta name="theme-color" content="#FFFFFF">
+<link rel="canonical" href="https://ipbatositaipuacu.github.io/">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="pt_BR">
 <meta property="og:title" content="Igreja Presbiteriana Atos em Itaipuaçu">
 <meta property="og:description" content="Pregações, podcast, horários e contato.">
 <meta property="og:image" content="https://ipbatositaipuacu.github.io/icone.png">
@@ -27,7 +30,7 @@
     --suave: #5F6B71;
   }
   * { box-sizing: border-box; margin: 0; }
-  html { -webkit-text-size-adjust: 100%; }
+  html { -webkit-text-size-adjust: 100%; -webkit-tap-highlight-color: transparent; }
   body {
     min-height: 100vh;
     min-height: 100dvh;
@@ -116,9 +119,9 @@
       <span class="texto"><strong>Pregações completas</strong><small>YouTube · Rev. Luiz Carlos Pinheiro</small></span>
     </a>
 
-    <a href="https://open.spotify.com/show/3iFh2dstNw8r6Yi8gNq7Oc" target="_blank" rel="noopener">
+    <a id="spotify" href="https://open.spotify.com/show/3iFh2dstNw8r6Yi8gNq7Oc" target="_blank" rel="noopener">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M7 9.6c3.4-1 7-.7 10 1M7.8 12.8c2.8-.8 5.6-.5 8 .9M8.6 15.8c2.1-.5 4.1-.3 5.9.7"/></svg>
-      <span class="texto"><strong>Sermões no Spotify</strong><small>Para ouvir no caminho</small></span>
+      <span class="texto"><strong>Sermões no Spotify</strong><small>O sermão mais recente e os anteriores</small></span>
     </a>
 
     <a href="https://ipatositaipuacu.ipb.org.br/" target="_blank" rel="noopener">
@@ -144,5 +147,23 @@
     <p>Igreja Presbiteriana do Brasil</p>
   </footer>
 </main>
+<script>
+  // Aponta o botão do Spotify para o sermão mais recente (ultimo-sermao.json é
+  // atualizado sozinho pelo GitHub). Se algo falhar, ou se o último sermão tiver
+  // mais de 4 semanas, o botão segue abrindo o podcast.
+  fetch("ultimo-sermao.json", { cache: "no-cache" })
+    .then(function (r) { return r.ok ? r.json() : null; })
+    .then(function (s) {
+      if (!s || !/^[A-Za-z0-9]{22}$/.test(s.id) || !s.titulo) return;
+      // Dado velho (automação parada): melhor o botão genérico do que um "último" antigo.
+      var idade = (Date.now() - Date.parse(s.data)) / 864e5;
+      if (!(idade < 28)) return;
+      var botao = document.getElementById("spotify");
+      botao.href = "https://open.spotify.com/episode/" + s.id;
+      botao.querySelector("strong").textContent = "Último sermão no Spotify";
+      botao.querySelector("small").textContent = s.titulo;
+    })
+    .catch(function () {});
+</script>
 </body>
 </html>

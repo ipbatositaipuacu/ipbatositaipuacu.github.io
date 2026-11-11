@@ -1,0 +1,30 @@
+name: Atualizar último sermão
+
+on:
+  schedule:
+    - cron: "17 10,22 * * *"   # duas vezes por dia: 7h17 e 19h17 de Brasília
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency: ultimo-sermao
+
+jobs:
+  atualizar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Buscar o episódio mais recente no Spotify
+        run: python3 .github/scripts/ultimo_sermao.py
+      - name: Publicar se mudou
+        run: |
+          git add ultimo-sermao.json
+          if git diff --cached --quiet; then
+            echo "Nada a publicar."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Atualiza o último sermão"
+          git push
